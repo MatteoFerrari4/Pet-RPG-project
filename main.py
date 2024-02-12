@@ -13,7 +13,7 @@ hero = Character(30, 1, [0, 0])
 hero_rectangle = Rectangle(hero.position[0], hero.position[1], 20, 20, color=(255,0,0))
 
 
-Merchant = NPC(5, 1, [10, 10])
+Merchant = NPC(5, 1, [10, 10], 40)
 Merchant_tile = Rectangle(Merchant.position[0], Merchant.position[1], 20, 20, color=(0,255,0))
 
 def update(dt):
