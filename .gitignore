@@ -115,7 +115,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-RPG_ENV/
+_RPG_VENV/
 environment/
 environment
 .env
