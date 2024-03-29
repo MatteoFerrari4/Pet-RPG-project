@@ -7,7 +7,8 @@ from utils.utils import opposite_color, switch_opacity, read_value_from_settings
 import config
 
 class Button():
-    pass
+    def __init__(self):
+        self.gravity = False
 
 class RectangleButton(Button):
     """
@@ -20,6 +21,7 @@ class RectangleButton(Button):
     """
 
     def __init__(self, rectangle: tuple, label: str, batch : Batch = None, color: tuple = (255,255,255,125)):
+        super().__init__()
         self.rectangle = Rectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3], batch=batch, color=color)
         self.label = Label(text=label, color=opposite_color(color), 
                            x=rectangle[0]+rectangle[2]//2, y=rectangle[1]+rectangle[3]//2,

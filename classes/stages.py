@@ -97,15 +97,14 @@ class Play(Stage):
         super().__init__(name, batch, objects_list)
         self.player = player
         self.player.rectangle.batch = batch
-        
-        self.objects_list.append(self.player)
 
     def read_input(self, pressed):
-        if pressed == key.LEFT:
-            self.player.rectangle.x -= 10 * self.player.speed
-        if pressed == key.RIGHT:
-            self.player.rectangle.x += 10 * self.player.speed
-        if pressed == key.UP:
-            self.player.rectangle.y += 10 * self.player.speed
-        if pressed == key.DOWN:
-            self.player.rectangle.y -= 10 * self.player.speed
+        self.player.read_input(pressed)
+
+class Level(Play):
+    """
+    #TODO
+    """
+
+    def __init__(self, name, batch, objects_list: list, player: Player):
+        super().__init__(name, batch, objects_list, player)

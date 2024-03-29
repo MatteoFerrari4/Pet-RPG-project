@@ -1,18 +1,28 @@
 from pyglet.window import Window, key
-from pyglet import app
-
-window = Window(800, 600)
+from pyglet import app, clock
 
 import config
+from utils.utils import read_value_from_settings
+
+window = Window(read_value_from_settings('window_width'),
+                read_value_from_settings('window_height'))
 
 from stages.mainmenu import init_mainmenu
-from stages.settings import init_settings
-from stages.pausemenu import init_pausemenu
-from stages.play import init_play
+from classes.stages import Settings, Play
 
-from classes.stages import MainMenu, Settings, Play
 
 config.stage_tree.append(init_mainmenu())
+
+fps = read_value_from_settings('fps')
+
+
+def update(dt):
+    #gravity
+    for object in config.stage_tree[-1].objects_list:
+        if object.gravity:
+            object.update_velocity(acceleration = [0, -1])
+            object.move()
+
 
 @window.event
 def on_draw():
@@ -36,5 +46,7 @@ def on_key_press(symbol, modifiers):
 
     if config.run_game == False:
         window.close()
+
+clock.schedule_interval(update, 1/fps)
 
 app.run()
