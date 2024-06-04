@@ -1,6 +1,9 @@
 from pyglet.window import key
-from random import randint
+from random import shuffle
 from functions.action import action
+from math import sqrt
+from classes.character import Character
+from variables import all_npcs
 
 class NPC():
     def __init__(self, hp: int, speed: int, position: list, freedom: int):
@@ -20,34 +23,39 @@ class NPC():
         self.position = position
         self.initial_position = position[:]  # Make a copy of the initial position
         self.freedom = freedom  # Maximum allowed distance from the initial position
+    
+    def distance(self, pos1, pos2):
+        """
+        Calculate the Euclidean distance between two points.
+        """
+        dx = pos1[0] - pos2[0]
+        dy = pos1[1] - pos2[1]
+        return sqrt(dx**2 + dy**2)
 
-    def distance_from_initial(self, new_position):
-        # Calculate the Manhattan distance from the initial position
-        return abs(new_position[0] - self.initial_position[0]) + abs(new_position[1] - self.initial_position[1])
+    def rand_move(self, Character: Character):
+        """
+        This method moves the NPC randomly within its freedom distance from the initial position.
+        """
+        # Check if the character is within 2 squares
+        if self.distance(Character.position, self.position) <= 5:
+            return
 
-    def rand_move(self):
-        if action():
-            directions = [1, 2, 3, 4]  # Possible directions
-            while directions:  # While there are directions left to try
-                dir = randint(0, len(directions) - 1)  # Select a random index from remaining directions
-                chosen_direction = directions[dir]  # Get the direction at the selected index
-                new_position = self.position[:]  # Copy the current position to calculate the potential new position
+        # Define all possible directions
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
-                # Adjust the new_position based on the chosen direction
-                if chosen_direction == 1:
-                    new_position[1] -= self.speed
-                elif chosen_direction == 2:
-                    new_position[1] += self.speed
-                elif chosen_direction == 3:
-                    new_position[0] -= self.speed
-                elif chosen_direction == 4:
-                    new_position[0] += self.speed
+        # Shuffle the directions to ensure randomness
+        shuffle(directions)
 
-                # Check if the new position is within the allowed distance from the initial position
-                if self.distance_from_initial(new_position) <= self.freedom:
-                    self.position = new_position  # Update the position if within bounds
-                    break  # Exit the loop since a valid move was found
-                else:
-                    directions.remove(chosen_direction)  # Remove the invalid direction and try again
+        # Iterate over each direction
+        for dx, dy in directions:
+            # Calculate the new position
+            new_position = (self.position[0] + dx, self.position[1] + dy)
 
-            # If no valid direction was found, the NPC does not move this turn
+            # Check if the new position is within the freedom distance from the initial position
+            if (self.distance(new_position,self.initial_position) <= self.freedom):
+                # If it is, update the position and return
+                self.position = new_position
+                return
+
+        # If no valid move was found, the NPC stays in the same position
+        return
