@@ -63,7 +63,7 @@ class Character:
             else:
                 self.sprite.image = self.images['hero_right_leg_left']
         # if the hero goes up or down, the sprite will be the last sprite used when moving left or right
-        elif pressed_key == key.W:  # Moving up
+        elif pressed_key == key.W or pressed_key == key.S:  # up
             if self.sprite.image in [self.images['hero_right_leg_right'], self.images['hero_right_leg_left'], self.images['hero_right']]:
                 self.sprite.image = self.images['hero_right']
             else:
