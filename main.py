@@ -10,8 +10,8 @@ fps = 30
 hero = Character(30, 1, [0, 0])
 
 
-Merchant1 = NPC(5, 1, [10, 10], 5, (0,255,255))
-Merchant2 = NPC(5, 1, [11, 11], 2, (255,0,255))
+Merchant1 = NPC(5, 1, [10, 10], 5)
+Merchant2 = NPC(5, 1, [11, 11], 2)
 
 
 
@@ -35,7 +35,7 @@ def on_draw():
     hero.sprite.draw()
     #draw the other npcs
     for npc in all_npcs:
-        npc.rec.draw()
+        npc.sprite.draw()
     
 
 

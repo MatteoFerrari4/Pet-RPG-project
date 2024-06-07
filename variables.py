@@ -4,5 +4,5 @@ hero_image_paths = ["img/hero_left.png", "img/hero_right_leg_right.png", "img/he
 
 npc_image_paths = ["img/merchant1.png", "img/merchant2.png"]
 
-height = 800
-width = 800
+height = 600
+width = 600

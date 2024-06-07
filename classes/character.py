@@ -5,16 +5,19 @@ from variables import all_npcs, width, height, hero_image_paths
 import os
 
 class Character:
+    """ A class representing the main character of the game."""
     def __init__(self, hp: int, speed: int, position: list):
+        """ Initialize the Character with its attributes.
+        hp (int): The health points of the Character.
+        speed (int): The speed of the Character.
+        position (list): The initial position of the Character."""
         self.hp = hp
         self.speed = speed
         self.position = position
         # Load and resize the images naming them by their file name without the path and the extension
         self.images = {os.path.basename(path).split('.')[0]: load_and_resize_image(path) for path in hero_image_paths}
-
         # Set the sprite to the first image
         self.sprite = Sprite(self.images['hero_right'], x=self.position[0], y=self.position[1])
-    
         # Map keys to movement directions
         self.key_map = {
             key.A: (-self.speed, 0),  # Left
@@ -26,7 +29,6 @@ class Character:
     def update(self, dt):
         """
         Update the position of the Sprite associated with the Character.
-
         Parameters:
         dt (float): The time elapsed since the last update.
         """
@@ -72,7 +74,6 @@ class Character:
         if pressed_key in self.key_map:
             dx, dy = self.key_map[pressed_key]
             new_position = [self.position[0] + dx, self.position[1] + dy]
-            
             # Ensure the new position is within the screen boundaries
             if 0 <= new_position[0]*self.sprite.width < width and 0 <= new_position[1]*self.sprite.height < height:
                 # Check for collisions with NPCs
