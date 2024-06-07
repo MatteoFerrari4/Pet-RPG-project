@@ -4,6 +4,8 @@ from pyglet.window import key
 from classes.player import Player
 from classes.buttons import Button
 
+from utils.utils import rectangle_collision
+
 class Stage():
     """
     Super-class
@@ -17,6 +19,9 @@ class Stage():
         self.name = name
         self.batch = batch
         self.objects_list = objects_list
+
+    def update(self):
+        pass
 
 class MainMenu(Stage):
     """
@@ -37,7 +42,7 @@ class MainMenu(Stage):
 
         self.objects_list[self.selected_button].switch_state()
 
-    def read_input(self, pressed):
+    def read_key_press(self, pressed):
         if pressed == key.UP:
             self.buttons_list[self.selected_button].switch_state()
             self.selected_button = (self.selected_button - 1) % len(self.buttons_list)
@@ -69,7 +74,7 @@ class Settings(Stage):
 
         self.objects_list[self.selected_button].switch_state()
 
-    def read_input(self, pressed):
+    def read_key_press(self, pressed):
         if pressed == key.UP:
             self.buttons_list[self.selected_button].switch_state()
             self.selected_button = (self.selected_button - 1) % len(self.buttons_list)
@@ -98,8 +103,12 @@ class Play(Stage):
         self.player = player
         self.player.rectangle.batch = batch
 
-    def read_input(self, pressed):
-        self.player.read_input(pressed)
+    def read_key_press(self, pressed):
+        self.player.read_key_press(pressed)
+    
+    def read_key_release(self, pressed):
+        self.player.read_key_release(pressed)
+
 
 class Level(Play):
     """
@@ -108,3 +117,14 @@ class Level(Play):
 
     def __init__(self, name, batch, objects_list: list, player: Player):
         super().__init__(name, batch, objects_list, player)
+
+    def update(self):
+        for obj in self.objects_list:
+            if obj.gravity:
+                obj.update_velocity(acceleration = [0, -1])
+
+            if not isinstance(obj, Player):
+                collisions = self.player.check_collision_direction(obj)
+    
+            if obj.mobile:
+                obj.move(collisions)

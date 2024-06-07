@@ -2,7 +2,7 @@ from pyglet.window import Window, key
 from pyglet import app, clock
 
 import config
-from utils.utils import read_value_from_settings
+from utils.utils import read_value_from_settings, rectangle_collision
 
 window = Window(read_value_from_settings('window_width'),
                 read_value_from_settings('window_height'))
@@ -17,11 +17,7 @@ fps = read_value_from_settings('fps')
 
 
 def update(dt):
-    #gravity
-    for object in config.stage_tree[-1].objects_list:
-        if object.gravity:
-            object.update_velocity(acceleration = [0, -1])
-            object.move()
+    config.stage_tree[-1].update()
 
 
 @window.event
@@ -42,10 +38,17 @@ def on_key_press(symbol, modifiers):
         else: pass
 
     else:
-        config.stage_tree[-1].read_input(symbol)
+        config.stage_tree[-1].read_key_press(symbol)
 
     if config.run_game == False:
         window.close()
+
+
+@window.event
+def on_key_release(symbol, modifiers):
+    if isinstance(config.stage_tree[-1], Play):
+        config.stage_tree[-1].read_key_release(symbol)
+
 
 clock.schedule_interval(update, 1/fps)
 
