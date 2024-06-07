@@ -1,61 +1,60 @@
-from pyglet.window import key
 from random import shuffle
-from functions.action import action
+from pyglet.sprite import Sprite
 from math import sqrt
-from classes.character import Character
-from variables import all_npcs
+from utils import load_and_resize_image
+from variables import all_npcs, npc_image_paths
 
-class NPC():
-    def __init__(self, hp: int, speed: int, position: list, freedom: int):
-        """
-        Initialize the NPC with health points, speed, initial position, and movement freedom.
-        
-        Parameters:
-        - hp (int): Health points of the NPC.
-        - speed (int): Movement speed of the NPC, indicating how many units it moves per action.
-        - position (list): A list containing the initial x and y coordinates of the NPC.
-        - freedom (int): The maximum distance the NPC can move from its initial position. The minimum value should
-                         be at least equal to the speed to allow movement. Setting freedom to a lower value than speed
-                         will effectively immobilize the NPC.
-        """
+class NPC:
+    def __init__(self, hp: int, speed: int, position: list, freedom: int, color = (125,125,125)):
         self.hp = hp
         self.speed = speed
         self.position = position
-        self.initial_position = position[:]  # Make a copy of the initial position
-        self.freedom = freedom  # Maximum allowed distance from the initial position
-    
-    def distance(self, pos1, pos2):
-        """
-        Calculate the Euclidean distance between two points.
-        """
-        dx = pos1[0] - pos2[0]
-        dy = pos1[1] - pos2[1]
-        return sqrt(dx**2 + dy**2)
+        self.initial_position = position.copy()
+        self.freedom = freedom
+        # Load and resize the images naming them by their file name without the path and the extension
+        #chose a random image from the npc_image_paths and make it unavailable for the next npcs
+        self.image = load_and_resize_image(npc_image_paths.pop())
+        self.rec = Sprite(self.image, x=self.position[0], y=self.position[1])
 
-    def rand_move(self, Character: Character):
-        """
-        This method moves the NPC randomly within its freedom distance from the initial position.
-        """
-        # Check if the character is within 2 squares
-        if self.distance(Character.position, self.position) <= 5:
+        all_npcs.append(self)
+
+    def update(self, dt):
+            """
+            Update the position of the Rectangle associated with the NPC.
+
+            Parameters:
+            dt (float): The time elapsed since the last update.
+            """
+            self.rec.x = self.position[0] * self.rec.width
+            self.rec.y = self.position[1] * self.rec.height
+
+
+    def distance_to(self, other):
+        """Calculate the distance to another object."""
+        return sqrt((self.position[0] - other.position[0]) ** 2 + (self.position[1] - other.position[1]) ** 2)
+
+    def collides_with(self, other_position):
+        """Check if the NPC collides with another position."""
+        return self.position == other_position
+
+    def rand_move(self, hero):
+        # Stop moving if the hero is within freedom distance
+        if self.distance_to(hero) <= self.freedom:
             return
 
-        # Define all possible directions
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        possible_moves = [(self.speed, 0), (-self.speed, 0), (0, self.speed), (0, -self.speed), (0,0), (0,0)]
+        shuffle(possible_moves)
 
-        # Shuffle the directions to ensure randomness
-        shuffle(directions)
+        for dx, dy in possible_moves:
+            new_position = [self.position[0] + dx, self.position[1] + dy]
 
-        # Iterate over each direction
-        for dx, dy in directions:
-            # Calculate the new position
-            new_position = (self.position[0] + dx, self.position[1] + dy)
-
-            # Check if the new position is within the freedom distance from the initial position
-            if (self.distance(new_position,self.initial_position) <= self.freedom):
-                # If it is, update the position and return
-                self.position = new_position
-                return
-
-        # If no valid move was found, the NPC stays in the same position
-        return
+            # Ensure the new position is within the freedom boundary
+            if (
+                self.initial_position[0] - self.freedom <= new_position[0] <= self.initial_position[0] + self.freedom and
+                self.initial_position[1] - self.freedom <= new_position[1] <= self.initial_position[1] + self.freedom
+            ):
+                # Check for collisions with the hero and other NPCs
+                collision = any(npc.position == new_position for npc in all_npcs if npc != self) or new_position == hero.position
+                if not collision:
+                    self.position = new_position
+                    break
