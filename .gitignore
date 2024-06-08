@@ -122,6 +122,7 @@ environment
 env/
 venv/
 ENV/
+_RPG_VENV/
 env.bak/
 venv.bak/
 
